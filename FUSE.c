@@ -11,7 +11,7 @@
 #include <grp.h>
 #include <time.h>
 
-static const char *dirpath = "/home/ugarpac/modul4/jgnhilang";
+static const char *dirpath = "/home/ugarpac/shift4";
 char cipher[] = {"qE1~ YMUR2\"`hNIdPzi%^t@(Ao:=CQ,nx4S[7mHFye#aT6+v)DfKL$r?bkOGB>}!9_wV']jcp5JZ&Xl|\\8s;g<{3.u*W-0"};
 char epath[1000], dpath[1000], mkfolder[1000], mkfile[1000];
 
