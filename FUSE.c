@@ -13,7 +13,7 @@
 
 static const char *dirpath = "/home/ugarpac/modul4/jgnhilang";
 char cipher[] = {"qE1~ YMUR2\"`hNIdPzi%^t@(Ao:=CQ,nx4S[7mHFye#aT6+v)DfKL$r?bkOGB>}!9_wV']jcp5JZ&Xl|\\8s;g<{3.u*W-0"};
-char epath[1000], dpath[1000];
+char epath[1000], dpath[1000], mkfolder[1000], mkfile[1000];
 
 void encrypt(char change[])
 {
@@ -135,18 +135,34 @@ static int xmp_readdir(const char *path, void *buf, fuse_fill_dir_t filler,
 				//comparing username and group (YES!!!!)
 				if( (strcmp(p->pw_name, "chipset") == 0 || strcmp(p->pw_name, "ic_controller") == 0) && strcmp(g->gr_name, "rusak") == 0 )
 				{
-					//it's time for record
-					FILE *teks;
-					int tahun = waktu->tm_year + 1900;
-					char sumber[1000];
-					char ketikan[2064];
-					sprintf(sumber, "%s/V[EOr[c[Y`HDH", dirpath);
-					sprintf(ketikan, "%s %d %d | waktu : %02d:%02d:%02d [%02d %02d %04d]\n", show, st.st_uid, st.st_gid, waktu->tm_hour, waktu->tm_min, waktu->tm_sec, waktu->tm_mday, waktu->tm_mon, tahun);
-					teks = fopen(sumber, "a");
-					fputs(ketikan, teks);
-					fclose(teks);
+					//check if file readable
+					if(fopen(show, "r") == NULL)
+					{
+						//error access??
+						if(errno == EACCES)
+						{
+							//it's time for record
+							FILE *teks;
+							int tahun = waktu->tm_year + 1900;
+							char sumber[1000];
+							char ketikan[2064];
+							sprintf(sumber, "%s/V[EOr[c[Y`HDH", dirpath);
+							sprintf(ketikan, "%s %d %d | waktu : %02d:%02d:%02d [%02d %02d %04d]\n", show, st.st_uid, st.st_gid, waktu->tm_hour, waktu->tm_min, waktu->tm_sec, waktu->tm_mday, waktu->tm_mon, tahun);
+							teks = fopen(sumber, "a");
+							fputs(ketikan, teks);
+							fclose(teks);
 
-					remove(show);
+							remove(show);
+						}
+					}	
+
+					//no.1
+					else 
+					{
+						decrypt(dpath);
+						res = (filler(buf, dpath, &st, 0));
+						if(res!=0) break;
+					}
 				}
 
 				//no.1
@@ -199,10 +215,111 @@ static int xmp_read(const char *path, char *st, size_t size, off_t offset,
 	return res;
 }
 
+//no.4
+static int xmp_mkdir(const char *path, mode_t mode)
+{ 
+    int res;
+	char fpath[1000];
+
+    strcpy(mkfolder,path);
+    encrypt(mkfolder);
+    sprintf(fpath, "%s%s", dirpath, mkfolder);
+
+    //youtube folder detection
+    if(strstr(fpath, "/@ZA>AXio/") != NULL)
+    {
+    	res = mkdir(fpath, 0750);
+    }
+    else res = mkdir(fpath, mode); 
+    
+    if(res == -1) return -errno; 
+
+    return 0; 
+}
+
+//no.4
+static int xmp_create(const char* path, mode_t mode, struct fuse_file_info* fi)
+{
+	int res;
+	char fpath[1000], new[1000];
+
+    strcpy(mkfile,path);
+    encrypt(mkfile);
+    sprintf(fpath, "%s%s", dirpath, mkfile);
+
+    //youtube folder detection
+    //stage 1, make a file
+    if(strstr(fpath, "/@ZA>AXio/") != NULL)
+    {
+    	res = creat(fpath, 0640);
+    }
+    else res = creat(fpath, mode);
+
+    if(res == -1)
+	return -errno;
+
+	//youtube folder detection
+	//stage 2, add .iz1 to filename
+    if(strstr(fpath, "/@ZA>AXio/") != NULL)
+    {
+    	strcpy(new, fpath);
+    	strcat(new, "`[S%");
+    	rename(fpath, new);
+    }
+
+    return 0;
+}
+
+//no.4
+static int xmp_chmod(const char *path, mode_t mode)
+{
+	int res;
+	char fpath[1000];
+
+    strcpy(mkfolder,path);
+    encrypt(mkfolder);
+    sprintf(fpath, "%s%s", dirpath, mkfolder);
+
+    //youtube folder detection
+    if(strstr(fpath, "/@ZA>AXio/") != NULL)
+    {	
+    	size_t ext = strlen(fpath), exts = strlen("`[S%");
+    	//in example, test.non, the position still 0
+    	//we add with length of those, which is 8.
+    	//we substract from length .non, which is 4.
+    	//now the position is 4.
+    	//tes[t].non
+    	//the return of the compared right is 0..
+    	//confused at first, but !strcmp() is 1 if the result of strcmp() is 0
+    	if(ext >= exts && !strcmp(fpath + ext - exts, "`[S%"))
+    	{
+    		pid_t anak;
+
+            anak = fork();
+            if(anak == 0)
+            {
+            	//zenity.... courtesy of sulton
+                char *argv[4] = {"zenity", "--warning", "--text='File ekstensi iz1 tidak boleh diubah permissionnya.'", NULL};
+                execv("/usr/bin/zenity", argv);
+            }
+            return 0;
+    	}
+    	else res = chmod(fpath, mode);
+    }
+    else res = chmod(fpath, mode);
+    
+    if(res == -1) return -errno; 
+
+	return 0;
+}
+
 static struct fuse_operations xmp_oper = {
 	.getattr	= xmp_getattr,
 	.readdir	= xmp_readdir,
 	.read		= xmp_read,
+	.mkdir      = xmp_mkdir,
+	.create     = xmp_create,
+	.chmod      = xmp_chmod
 };
 
 int main(int argc, char *argv[])
