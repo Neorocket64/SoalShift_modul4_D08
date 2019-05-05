@@ -279,10 +279,6 @@ static int xmp_unlink(const char *path)
 ### Screenshot
 * File yang akan diupdate disini adalah file `test.txt`
 	![bottom text](Screenshot/5a.png "test akan diupdate")
-
-### Screenshot
-* File yang akan diupdate disini adalah file `test.txt`
-	![bottom text](Screenshot/5a.png "test akan diupdate")
 	
 * Setelah file diupdate dan disave, muncul folder `Backup`
 	![bottom text](Screenshot/5b.png "test akan diupdate")
