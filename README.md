@@ -73,7 +73,9 @@ Urutan operasi dari kebutuhan ini adalah:
   * Hapus folder “Videos” 
 
 ### Pembuatan
-
+Solusi belum selesai terbuat
+## Kendala
+Terdapat kesulitan dalam memahami penggunaan fungsi init dan saat melakukan join menggunakan thread
 
 ## #Soal 3
 
