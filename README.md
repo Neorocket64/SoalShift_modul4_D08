@@ -8,8 +8,54 @@ Enkripsi yang Atta inginkan sangat sederhana, yaitu Caesar cipher. Namun, Kusuma
 qE1~ YMUR2"`hNIdPzi%^t@(Ao:=CQ,nx4S[7mHFye#aT6+v)DfKL$r?bkOGB>}!9_wV']jcp5JZ&Xl|\8s;g<{3.u*W-0
 ```
 
-### Pembuatan
+### En/Decrypt
 
+Untuk de/encrypt, akan dilakukan satu-per-satu karakter sampai line dibaca semua. caranya, melakukan pencarian posisi char list `cipher` yang dipakai. (IE jika `q`, maka posisinya dalam char list di no. 1)
+```c
+if(ch == '/') continue; //char ini tidak diganti
+
+for(i = 0; i < strlen(cipher); i++)
+		{
+			if(ch == cipher[i]) break;
+		}
+```
+
+setelah itu, posisi char list yang disimpan dalam variabel `i` akan berubah value (geser kanan atau kiri) dan kemudian char pada line target pada posisi tertentu akan digantikan dengan char dalam `cipher`
+```c
+//encrypt
+		i = i + 17;
+		if(i > 93) i = i - strlen(cipher);
+//decrypt
+  i = i - 17;
+		if(i < 0) i = i + strlen(cipher);
+  
+  change[n] = cipher[i];
+```
+
+### Integrasi ke FUSE
+Karena file sebelum di-mount sudah dienkrip, maka kita akan memunculkan dalam explorer dalam bentuk yang sudah didekrip tanpa menggantikan nama dalam folder yang dimount (tidak permanen).
+
+
+`Dalam fungsi xmp_readdir`
+
+untuk filler, didekrip supaya terlihat terdekrip dalam sisi penampilan
+```c
+  decrypt(dpath);
+		res = (filler(buf, dpath, &st, 0));
+```
+
+tapi, untuk mencari actual direktori, karena terdekrip, maka harus dienkrip lagi
+```c
+strcpy(epath, path);
+		if(strcmp(epath, ".") != 0 && strcmp(epath, "..") != 0)encrypt(epath);
+		sprintf(fpath, "%s%s", dirpath, epath);
+```
+`fpath` akan digunakan untuk keperluan open directory
+
+
+`Fungsi lain, seperti; xmp_getattr dan xmp_read`
+
+sama seperti cara mengenkrip directory path sebelumnya, dilakukan agar file asli tetap bisa dibaca (getattr untuk mendapatkan info seputar file tersebut dan read untuk membaca file (bukan membaca direktori))
 
 ## #Soal 2
 
