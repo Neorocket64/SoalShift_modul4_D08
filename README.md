@@ -118,10 +118,10 @@ static int xmp_write(const char *path, const char *buf, size_t size,
     return res;
 }
 ```
-    Unlink berfungsi untuk:
-        * Membuat folder `RecycleBin` jika belum ada
-        * Mengkompress file dan file backup menjadi zip dan dimasukkan ke folder `RecycleBin`
-        * Menghapus file asli
+ Unlink berfungsi untuk:
+     * Membuat folder `RecycleBin` jika belum ada
+     * Mengkompress file dan file backup menjadi zip dan dimasukkan ke folder `RecycleBin`
+     * Menghapus file asli
 ```c
 static int xmp_unlink(const char *path)
 {
