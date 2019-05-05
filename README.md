@@ -85,12 +85,85 @@ Jika ditemukan file dengan spesifikasi tersebut ketika membuka direktori, Atta a
 
 ### Pembuatan
 
+Pertama, kita ambil property id dan grup dari suatu file (yang dimana id masing-masing didapatkan di `struct stat st`)
+```c
+struct passwd *p = getpwuid(st.st_uid);
+struct group *g = getgrgid(st.st_gid);
+```
+
+Kemudian kita compare user dan group kepada yang diinginkan;
+```c
+if( (strcmp(p->pw_name, "chipset") == 0 || strcmp(p->pw_name, "ic_controller") == 0) && strcmp(g->gr_name, "rusak") == 0 )
+```
+
+Cara untuk deteksi apakah filenya bisa dibaca sebagai berikut;
+```c
+if(fopen(show, "r") == NULL) //r adalah read. akan mengeluarkan 0 jika bisa dibaca
+{
+	if(errno == EACCES) //jika disebabkan oleh keterbatasan akses (a.k.a diblokir)
+	{
+	//insert writing
+	}
+}
+```
+
+Setelah itu, dibuat (jika belum) file txt (yang tentu dalam bentuk enkripsi) dan menambahkan string detail file dan waktu akses dalam file (txt) tersebut
+```c
+teks = fopen(sumber, "a"); //a = append (jika tidak ada file, auto buat file tersebut)
+fputs(ketikan, teks);
+fclose(teks);
+```
+
+Semua itu dalam `xmp_readdir`.
+
 ## #Soal 4
 
 Pada folder YOUTUBER, setiap membuat folder permission foldernya akan otomatis menjadi 750. Juga ketika membuat file permissionnya akan otomatis menjadi 640 dan ekstensi filenya akan bertambah “.iz1”. File berekstensi “.iz1” tidak bisa diubah permissionnya dan memunculkan error bertuliskan “File ekstensi iz1 tidak boleh diubah permissionnya.”
 
 ### Pembuatan
 
+`if(strstr(fpath, "/@ZA>AXio/") != NULL)` berfungsi untuk mendeteksi folder `YOUTUBE` (tapi telah terenkripsi) dari manapun dalam folder yang di-mount (`fpath` = path folder "sekarang")
+
+`xmp_mkdir`
+
+Akan melakukan fungsi `res = mkdir(fpath, 0750)` jika berada dalam folder `YOUTUBE` (yaitu saat membuat folder, otomatis berubah permission menjadi `750`).
+
+`xmp_create`
+
+Sama halnya dengan sebelumnya, namun akan melakukan ini; `res = creat(fpath, 0640)` (permission menjadi `640`).
+
+Kemudian, file yang telah dibuat akan ditambah ekstensi `.iz1`;
+```c
+strcpy(new, fpath);
+strcat(new, "`[S%");
+rename(fpath, new);
+```
+
+`xmp_chmod`
+
+Khusus untuk file berekstensi `.iz1` dalam folder `YOUTUBE`, tidak bisa diubah permissionnya.
+```c
+size_t ext = strlen(fpath), exts = strlen("`[S%");
+if(ext >= exts && !strcmp(fpath + ext - exts, "`[S%"))
+{
+//insert action here
+}
+
+//penjelasan mengenai cara deteksi ekstensi .iz1 adalah sebagai berikut;
+//in example, test.non will be used for compare to find if it's ended with ".non" 
+//as for strcmp, the position for comparing is at 0
+//we add with length of those (ext), which is 8.
+//we substract from length .non (exts, supposed to be .iz1 on final), which is 4.
+//now the position is 4.
+//test[.]non --> we are gonna compare at that point.
+//the return of the compared right is 0.. hence why it's !strcmp() on code
+```
+
+Untuk mengeluarkan error, menggunakan zenity;
+```c
+char *argv[4] = {"zenity", "--warning", "--text='File ekstensi iz1 tidak boleh diubah permissionnya.'", NULL};
+execv("/usr/bin/zenity", argv);
+```
 
 ## #Soal 5
 
