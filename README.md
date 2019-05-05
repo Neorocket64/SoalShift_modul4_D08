@@ -276,3 +276,6 @@ static int xmp_unlink(const char *path)
     return 0;
 }
 ```
+### Screenshot
+* File yang akan diupdate disini adalah file `test.txt`
+	![bottom text](screenshot/5a.png "test akan diupdate")
