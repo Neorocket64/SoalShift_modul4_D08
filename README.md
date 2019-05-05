@@ -279,3 +279,19 @@ static int xmp_unlink(const char *path)
 ### Screenshot
 * File yang akan diupdate disini adalah file `test.txt`
 	![bottom text](Screenshot/5a.png "test akan diupdate")
+
+### Screenshot
+* File yang akan diupdate disini adalah file `test.txt`
+	![bottom text](Screenshot/5a.png "test akan diupdate")
+	
+* Setelah file diupdate dan disave, muncul folder `Backup`
+	![bottom text](Screenshot/5b.png "test akan diupdate")
+
+* Isi didalam folder `Backup` adalah sebuah file arsip dari file asli `test.txt`
+	![bottom text](Screenshot/5c.png "test akan diupdate")
+	
+* Saat file asli dihapus, akan terbuat folder `RecycleBin` kemudian folder `Backup` juga terhapus
+	![bottom text](Screenshot/5d.png "test akan diupdate")
+
+* Isi dari folder `RecycleBin` adalah file zip yang berisi file `test.txt` asli yang terhapus dan folder `Backup`nya
+	![bottom text](Screenshot/5e.png "test akan diupdate")
