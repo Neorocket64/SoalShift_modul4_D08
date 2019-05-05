@@ -53,8 +53,11 @@ Ketika mengedit suatu file dan melakukan save, maka akan terbuat folder baru ber
 ### Pembuatan
 * Menggunakan fungsi write dan unlink
   Write berfungsi untuk:
+  
       * Membuat folder `Backup` jika belum ada
+      
       * Meletakkan salinan file yang diupdate kedalam folder `Backup`
+      
       * Menyimmpan file perubahan
 
 ```c
@@ -119,8 +122,11 @@ static int xmp_write(const char *path, const char *buf, size_t size,
 }
 ```
  Unlink berfungsi untuk:
+ 
      * Membuat folder `RecycleBin` jika belum ada
+     
      * Mengkompress file dan file backup menjadi zip dan dimasukkan ke folder `RecycleBin`
+     
      * Menghapus file asli
 ```c
 static int xmp_unlink(const char *path)
