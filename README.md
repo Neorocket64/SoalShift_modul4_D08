@@ -57,6 +57,18 @@ strcpy(epath, path);
 
 sama seperti cara mengenkrip directory path sebelumnya, dilakukan agar file asli tetap bisa dibaca (getattr untuk mendapatkan info seputar file tersebut dan read untuk membaca file (bukan membaca direktori))
 
+### Screenshots
+
+ini folder yang akan dijadikan `root`;
+
+![bottom text](Screenshot/soal1_1.png "virtual root")
+
+kemudian, di folder `mount`;
+
+![bottom text](Screenshot/soal1_2.png "mounted")
+
+![bottom text](Screenshot/soal1_4.png "folder in mounted")
+
 ## #Soal 2
 
 Semua file video yang tersimpan secara terpecah-pecah (splitted) harus secara otomatis tergabung (joined) dan diletakkan dalam folder “Videos”
@@ -118,6 +130,24 @@ fclose(teks);
 
 Semua itu dalam `xmp_readdir`.
 
+### Screenshots
+
+Pertama buat file yang dimodifikasi permission, user, dan group-nya;
+
+![bottom text](Screenshot/soal3_1.png "modified!")
+
+Kemudian, pindahkan ke folder `root`;
+
+![bottom text](Screenshot/soal3_2.png "pindah tempat!")
+
+Setelah itu, saat di-mount ke tujuan;
+
+![bottom text](Screenshot/soal3_3.png "menghilang!")
+
+File telah terisikan sesuatu;
+
+![bottom text](Screenshot/soal3_4.png "modified!")
+
 ## #Soal 4
 
 Pada folder YOUTUBER, setiap membuat folder permission foldernya akan otomatis menjadi 750. Juga ketika membuat file permissionnya akan otomatis menjadi 640 dan ekstensi filenya akan bertambah “.iz1”. File berekstensi “.iz1” tidak bisa diubah permissionnya dan memunculkan error bertuliskan “File ekstensi iz1 tidak boleh diubah permissionnya.”
@@ -166,6 +196,32 @@ Untuk mengeluarkan error, menggunakan zenity;
 char *argv[4] = {"zenity", "--warning", "--text='File ekstensi iz1 tidak boleh diubah permissionnya.'", NULL};
 execv("/usr/bin/zenity", argv);
 ```
+
+### Screenshots
+
+dalam folder `YOUTUBE`, buat folder;
+
+![bottom text](Screenshot/soal4_1.png "loss??")
+
+permission folder `loss` tergantikan!
+
+![bottom text](Screenshot/soal4_2.png "permission ganti!")
+
+saat `touch` suatu file, file tidak ditemukan?
+
+![bottom text](Screenshot/soal4_3.png "tidak ada filenya?")
+
+tapi kemudian, setelah cek folder melalui `ls -l`, berubah dengan ekstensi .iz1 dan berubah pula permissionnya
+
+![bottom text](Screenshot/soal4_4.png "file sudah menjadi .iz1!")
+
+saat hendak ganti permission dengan `sudo`;
+
+![bottom text](Screenshot/soal4_5.png "denied!")
+
+tanpa `sudo`;
+
+![bottom text](Screenshot/soal4_7.png "muncul error!")
 
 ## #Soal 5
 
