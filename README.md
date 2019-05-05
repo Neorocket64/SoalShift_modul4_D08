@@ -51,8 +51,7 @@ Pada folder YOUTUBER, setiap membuat folder permission foldernya akan otomatis m
 Ketika mengedit suatu file dan melakukan save, maka akan terbuat folder baru bernama Backup kemudian hasil dari save tersebut akan disimpan pada backup dengan nama namafile_[timestamp].ekstensi. Dan ketika file asli dihapus, maka akan dibuat folder bernama RecycleBin, kemudian file yang dihapus beserta semua backup dari file yang dihapus tersebut (jika ada) di zip dengan nama namafile_deleted_[timestamp].zip dan ditaruh ke dalam folder RecycleBin (file asli dan backup terhapus). Dengan format [timestamp] adalah yyyy-MM-dd_HH:mm:ss
 
 ### Pembuatan
-* Menggunakan fungsi write dan unlink
-  Write berfungsi untuk:
+* Menggunakan fungsi Write yang berguna untuk:
   
     * Membuat folder `Backup` jika belum ada
 
@@ -121,7 +120,7 @@ static int xmp_write(const char *path, const char *buf, size_t size,
     return res;
 }
 ```
- Unlink berfungsi untuk:
+* Unlink berfungsi untuk:
 
    * Membuat folder `RecycleBin` jika belum ada
 
