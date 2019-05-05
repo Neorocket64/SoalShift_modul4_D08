@@ -51,3 +51,102 @@ Pada folder YOUTUBER, setiap membuat folder permission foldernya akan otomatis m
 Ketika mengedit suatu file dan melakukan save, maka akan terbuat folder baru bernama Backup kemudian hasil dari save tersebut akan disimpan pada backup dengan nama namafile_[timestamp].ekstensi. Dan ketika file asli dihapus, maka akan dibuat folder bernama RecycleBin, kemudian file yang dihapus beserta semua backup dari file yang dihapus tersebut (jika ada) di zip dengan nama namafile_deleted_[timestamp].zip dan ditaruh ke dalam folder RecycleBin (file asli dan backup terhapus). Dengan format [timestamp] adalah yyyy-MM-dd_HH:mm:ss
 
 ### Pembuatan
+* Menggunakan fungsi write dan unlink
+  Write berfungsi untuk:
+      * Membuat folder `Backup` jika belum ada
+      * Meletakkan salinan file yang diupdate kedalam folder `Backup`
+      * Menyimmpan file perubahan
+
+```c
+static int xmp_write(const char *path, const char *buf, size_t size,
+             off_t offset, struct fuse_file_info *fi)
+{
+    int fd;
+    int res;
+    char fpath[1000], fpathbaru[1000], folderbaru[1000], fpathtmp[1000];
+    char nameenc[1000], name_tmp[1000];
+    
+    char folder[] = "BACKUP";
+    time_t now = time(NULL);
+    struct tm wkt_now;
+    struct stat st;
+    pid_t pid;
+
+    sprintf(nameenc,"%s",path);
+    encrypt(nameenc);
+    strcpy(name_tmp, nameenc);
+    printf("NAME ENC%s\n", nameenc);
+    sprintf(fpath, "%s/%s",dirpath,nameenc);
+    printf("FPATH %s\n", fpath);
+
+    fd = open(fpath, O_WRONLY);
+    if (fd == -1)
+        return -errno;
+    res = pwrite(fd, buf, size, offset);
+    if (res == -1)
+        return -errno;
+
+    close(fd);
+
+    decrypt(nameenc);
+    wkt_now = *localtime(&now);
+    char new[1000], newpath[1000];
+    sprintf(new, "%s_%d-%d-%d_%d:%d:%d.ekstensi", nameenc, wkt_now.tm_year+1900, wkt_now.tm_mon, wkt_now.tm_mday, wkt_now.tm_hour, wkt_now.tm_min, wkt_now.tm_sec);
+    printf("NEW NAME %s\n", new);
+    encrypt(new);
+
+    sprintf(fpathbaru, "%s/%s", dirpath, new);
+    sprintf(fpathtmp, "%s", fpath);
+    
+    encrypt(folder);
+    sprintf(folderbaru, "%s/%s", dirpath, folder);
+    if(stat(folderbaru, &st)<0){
+        mkdir(folderbaru, 0755);
+        printf("BUAT FOLDER %s\n", folderbaru);
+    }
+    printf("\nfpathbaru %s \n\nFOLDER BARU %s\n", fpathbaru, folderbaru);
+    if((pid=fork())==0){
+        sprintf(newpath, "%s/%s", folderbaru, new);
+        char *argv[] = {"cp", fpathtmp, newpath, NULL};
+        if((execv("/bin/cp", argv))<0){
+            printf("GAGAL CP %s\n", folderbaru);
+        }
+    }else{
+        printf("\nSETELAH CP ke %s\n", folderbaru);
+    }
+
+    return res;
+}
+```
+    Unlink berfungsi untuk:
+        * Membuat folder `RecycleBin` jika belum ada
+        * Mengkompress file dan file backup menjadi zip dan dimasukkan ke folder `RecycleBin`
+        * Menghapus file asli
+```c
+static int xmp_unlink(const char *path)
+{
+    int res;
+    char fpath[1000];
+    char nameenc[1000], folder[] = "RecycleBin", *folderbaru = NULL;
+
+    struct stat st;
+    sprintf(nameenc,"%s",path);
+    encrypt(nameenc);
+    sprintf(fpath, "%s%s",dirpath,nameenc);
+
+
+    encrypt(folder);
+    sprintf(folderbaru, "%s/%s", dirpath, folder);
+    if (stat(folderbaru, &st) < 0)
+    {
+        mkdir(folderbaru, 0755);
+        printf("BUAT FOLDER %s\n", folderbaru);
+    }
+
+    res = unlink(fpath);
+    if (res == -1)
+        return -errno;
+
+    return 0;
+}
+```
